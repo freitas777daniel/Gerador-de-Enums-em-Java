@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <title>Gerador de Enums</title>
     <!-- Importando o Semantic UI CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
-    <!-- Importando o Semantic UI JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
     <!-- Importando o jQuery (necessário para o Semantic UI) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Importando o Semantic UI JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
     <style>
         body {
             margin: 20px;
@@ -26,356 +25,439 @@
             overflow: auto;
         }
 
-        /* Estilo para alinhar o botão à direita */
-        .right-aligned-button {
-            text-align: right;
-            margin-top: 5px;
+        /* Ajustes para responsividade */
+        @media only screen and (max-width: 767px) {
+            .fields .field {
+                width: 100% !important;
+            }
         }
     </style>
 </head>
-
 <body>
 
-    <div class="ui container">
-        <h2 class="ui dividing header">Gerador de Enums em Java</h2>
+<div class="ui container">
+    <h2 class="ui dividing header">Gerador de Enums em Java</h2>
 
-        <!-- Instruções de Uso -->
-        <div class="ui message">
-            <h3>Instruções de Uso</h3>
-            <p>
-                Preencha os campos abaixo para gerar um enum em Java:
-            </p>
-            <ul>
-                <li><strong>Nome do Enum:</strong> Insira o nome desejado para o enum. Por exemplo, se digitar
-                    <code>situacoes</code>, o nome da classe será <code>SituacoesEnum</code>.</li>
-                <li><strong>Entrada CSV:</strong> Insira os pares de <code>ID,DESCRIÇÃO</code>, um por linha. Exemplo:
-                    <pre>1,SUCESSO
+    <!-- Instruções de Uso -->
+    <div class="ui message">
+        <h3>Instruções de Uso</h3>
+        <p>
+            Preencha os campos abaixo para gerar um enum em Java:
+        </p>
+        <ul>
+            <li><strong>Nome do Enum:</strong> Insira o nome desejado para o enum. Por exemplo, se digitar <code>situacoes</code>,
+                o nome da classe será <code>SituacoesEnum</code>.
+            </li>
+            <li><strong>Entrada CSV:</strong> Insira os pares de <code>ID,DESCRIÇÃO</code>, um por linha. Exemplo:
+                <pre>1,SUCESSO
 2,FALHA</pre>
+            </li>
+            <li><strong>Opções:</strong></li>
+            <ul>
+                <li><strong>Usar Lombok:</strong> Inclui as anotações do Lombok (<code>@Getter</code>, <code>@AllArgsConstructor</code>)
+                    no código gerado.
                 </li>
-                <li><strong>Opções:</strong></li>
-                <ul>
-                    <li><strong>Usar Lombok:</strong> Inclui as anotações do Lombok (<code>@Getter</code>,
-                        <code>@AllArgsConstructor</code>) no código gerado.</li>
-                    <li><strong>Usar Lambda:</strong> Utiliza expressões lambda nos métodos gerados.</li>
-                </ul>
-                <li><strong>Operações:</strong> Selecione os métodos que deseja incluir no enum:
-                    <ul>
-                        <li><strong>isValid:</strong> Método para verificar se um código é válido.</li>
-                        <li><strong>get:</strong> Método para obter o enum a partir de um código.</li>
-                        <li><strong>getInstance:</strong> Inclui os métodos <code>getInstance()</code> e
-                            <code>getInstance(Integer codigo)</code>.</li>
-                        <li><strong>is[EnumName]:</strong> Gera métodos estáticos para cada constante do enum (por
-                            exemplo, <code>isSucesso()</code>).</li>
-                    </ul>
-                </li>
+                <li><strong>Usar Lambda:</strong> Utiliza expressões lambda nos métodos gerados.</li>
             </ul>
-            <p>Após preencher os campos e selecionar as opções desejadas, clique em <strong>Gerar</strong> para criar o
-                código do enum.</p>
-        </div>
-
-        <div class="ui form">
-            <div class="field">
-                <label>Nome do Enum</label>
-                <input type="text" id="enumName" placeholder="Digite o nome do enum...">
-            </div>
-
-            <div class="fields">
-                <div class="eight wide field">
-                    <label>Entrada CSV (ID, Descrição)</label>
-                    <textarea id="csvInput" rows="15" placeholder="Exemplo:\n1,SUCESSO\n2,FALHA"></textarea>
-                </div>
-
-                <div class="eight wide field">
-                    <label>Código Gerado</label>
-                    <textarea id="enumOutput" rows="15" readonly></textarea>
-                    <!-- Botão "Copiar" abaixo da caixa de texto, alinhado à direita -->
-                    <div class="right-aligned-button">
-                        <button class="ui tiny button" id="copyBtn">Copiar</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="inline fields">
-                <label>Opções:</label>
-                <div class="field">
-                    <div class="ui checkbox">
-                        <input type="checkbox" id="useLombok">
-                        <label>Usar Lombok</label>
-                    </div>
-                </div>
-                <div class="field">
-                    <div class="ui checkbox">
-                        <input type="checkbox" id="useLambda">
-                        <label>Usar Lambda</label>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Checkboxes das Operações -->
-            <div class="inline fields">
-                <label>Operações:</label>
-                <div class="field">
-                    <div class="ui checkbox">
-                        <input type="checkbox" id="includeIsValid" checked>
-                        <label>isValid</label>
-                    </div>
-                </div>
-                <div class="field">
-                    <div class="ui checkbox">
-                        <input type="checkbox" id="includeGet" checked>
-                        <label>get</label>
-                    </div>
-                </div>
-                <!-- Apenas um checkbox para getInstance -->
-                <div class="field">
-                    <div class="ui checkbox">
-                        <input type="checkbox" id="includeGetInstance" checked>
-                        <label>getInstance</label>
-                    </div>
-                </div>
-                <div class="field">
-                    <div class="ui checkbox">
-                        <input type="checkbox" id="includeIsEnumName" checked>
-                        <label>is[EnumName]</label>
-                    </div>
-                </div>
-            </div>
-
-            <button class="ui primary button" id="generateBtn">Gerar</button>
-        </div>
+            <li><strong>Operações:</strong> Selecione os métodos que deseja incluir no enum:
+                <ul>
+                    <li><strong>isValid:</strong> Método para verificar se um código é válido.</li>
+                    <li><strong>get:</strong> Método para obter o enum a partir de um código.</li>
+                    <li><strong>getInstance:</strong> Inclui os métodos <code>getInstance()</code> e <code>getInstance(Integer
+                        codigo)</code>.
+                    </li>
+                    <li><strong>is[EnumName]:</strong> Gera métodos estáticos para cada constante do enum (por exemplo,
+                        <code>isSucesso()</code>).
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        <p>Após preencher os campos e selecionar as opções desejadas, clique em <strong>Gerar</strong> para criar o
+            código do enum.</p>
     </div>
 
-    <script>
-        // Função para remover acentos e caracteres especiais
-        function sanitizeEnumName(str) {
-            const map = {
-                'Á': 'A', 'À': 'A', 'Ã': 'A', 'Â': 'A', 'Ä': 'A',
-                'É': 'E', 'È': 'E', 'Ê': 'E', 'Ë': 'E',
-                'Í': 'I', 'Ì': 'I', 'Î': 'I', 'Ï': 'I',
-                'Ó': 'O', 'Ò': 'O', 'Ô': 'O', 'Õ': 'O', 'Ö': 'O',
-                'Ú': 'U', 'Ù': 'U', 'Û': 'U', 'Ü': 'U',
-                'Ç': 'C',
-                'Ñ': 'N',
-                'á': 'a', 'à': 'a', 'ã': 'a', 'â': 'a', 'ä': 'a',
-                'é': 'e', 'è': 'e', 'ê': 'e', 'ë': 'e',
-                'í': 'i', 'ì': 'i', 'î': 'i', 'ï': 'i',
-                'ó': 'o', 'ò': 'o', 'ô': 'o', 'õ': 'o', 'ö': 'o',
-                'ú': 'u', 'ù': 'u', 'û': 'u', 'ü': 'u',
-                'ç': 'c',
-                'ñ': 'n',
-                'º': '', 'ª': '', '°': '',
-                '/': '_', '%': '', '.': '', ',': '', ';': '', ':': '', '!': '', '?': '',
-                '(': '', ')': '', '[': '', ']': '', '{': '', '}': '', '&': '', '*': '',
-                '+': '', '=': '', '<': '', '>': '', '@': '', '#': '', '$': '', '^': '', '~': '', '`': '',
-                '²': '2', '³': '3', 'ª': '', 'º': '', '°': '', 'ª': ''
-            };
-            return str.replace(/[^\w\s]/gi, function (char) {
-                return map[char] || '';
-            }).replace(/\s+/g, '_').toUpperCase();
+    <div class="ui form">
+        <div class="field">
+            <label for="nomeEnumInput">Nome do Enum</label>
+            <input type="text" id="nomeEnumInput" placeholder="Digite o nome do enum...">
+        </div>
+
+        <div class="fields">
+            <div class="sixteen wide mobile eight wide computer field">
+                <!-- Container para label e botões -->
+                <div class="ui grid">
+                    <div class="eight wide column">
+                        <label>Entrada CSV (ID, Descrição)</label>
+                    </div>
+                    <div class="eight wide column right aligned">
+                        <!-- Barra de botões -->
+                        <div class="ui small basic icon buttons">
+                            <button class="ui button" id="copiarEntradaCsv"><i class="clipboard icon"></i></button>
+                            <button class="ui button" id="limparEntradaCsv"><i class="trash icon"></i></button>
+                            <button class="ui button" id="baixarEntradaCsv"><i class="download icon"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <textarea id="entradaCsv" rows="15" placeholder="Exemplo:\n1,SUCESSO\n2,FALHA"></textarea>
+            </div>
+
+            <div class="sixteen wide mobile eight wide computer field">
+                <!-- Container para label e botões -->
+                <div class="ui grid">
+                    <div class="eight wide column">
+                        <label>Código Gerado</label>
+                    </div>
+                    <div class="eight wide column right aligned">
+                        <!-- Barra de botões -->
+                        <div class="ui small basic icon buttons">
+                            <button class="ui button" id="copiarCodigoGerado"><i class="clipboard icon"></i></button>
+                            <button class="ui button" id="limparCodigoGerado"><i class="trash icon"></i></button>
+                            <button class="ui button" id="baixarCodigoGerado"><i class="download icon"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <textarea id="codigoGerado" rows="15" readonly></textarea>
+            </div>
+        </div>
+
+        <div class="inline fields">
+            <label>Opções:</label>
+            <div class="field">
+                <div class="ui checkbox">
+                    <input type="checkbox" id="usarLombok">
+                    <label for="usarLombok">Usar Lombok</label>
+                </div>
+            </div>
+            <div class="field">
+                <div class="ui checkbox">
+                    <input type="checkbox" id="usarLambda">
+                    <label for="usarLambda">Usar Lambda</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Checkboxes das Operações -->
+        <div class="inline fields">
+            <label>Operações:</label>
+            <div class="field">
+                <div class="ui checkbox">
+                    <input type="checkbox" id="incluirIsValid" checked>
+                    <label for="incluirIsValid">isValid</label>
+                </div>
+            </div>
+            <div class="field">
+                <div class="ui checkbox">
+                    <input type="checkbox" id="incluirGet" checked>
+                    <label for="incluirGet">get</label>
+                </div>
+            </div>
+            <!-- Apenas um checkbox para getInstance -->
+            <div class="field">
+                <div class="ui checkbox">
+                    <input type="checkbox" id="incluirGetInstance" checked>
+                    <label for="incluirGetInstance">getInstance</label>
+                </div>
+            </div>
+            <div class="field">
+                <div class="ui checkbox">
+                    <input type="checkbox" id="incluirIsEnumName" checked>
+                    <label for="incluirIsEnumName">is[EnumName]</label>
+                </div>
+            </div>
+        </div>
+
+        <button class="ui primary button" id="botaoGerar">Gerar</button>
+    </div>
+</div>
+
+<script>
+    // Função para remover acentos e caracteres especiais
+    function sanitizarNomeEnum(str) {
+        const mapa = {
+            'Á': 'A', 'À': 'A', 'Ã': 'A', 'Â': 'A', 'Ä': 'A',
+            'É': 'E', 'È': 'E', 'Ê': 'E', 'Ë': 'E',
+            'Í': 'I', 'Ì': 'I', 'Î': 'I', 'Ï': 'I',
+            'Ó': 'O', 'Ò': 'O', 'Ô': 'O', 'Õ': 'O', 'Ö': 'O',
+            'Ú': 'U', 'Ù': 'U', 'Û': 'U', 'Ü': 'U',
+            'Ç': 'C',
+            'Ñ': 'N',
+            'á': 'a', 'à': 'a', 'ã': 'a', 'â': 'a', 'ä': 'a',
+            'é': 'e', 'è': 'e', 'ê': 'e', 'ë': 'e',
+            'í': 'i', 'ì': 'i', 'î': 'i', 'ï': 'i',
+            'ó': 'o', 'ò': 'o', 'ô': 'o', 'õ': 'o', 'ö': 'o',
+            'ú': 'u', 'ù': 'u', 'û': 'u', 'ü': 'u',
+            'ç': 'c',
+            'ñ': 'n',
+            'º': '', 'ª': '', '°': '',
+            '/': '_', '%': '', '.': '', ',': '', ';': '', ':': '', '!': '', '?': '',
+            '(': '', ')': '', '[': '', ']': '', '{': '', '}': '', '&': '', '*': '',
+            '+': '', '=': '', '<': '', '>': '', '@': '', '#': '', '$': '', '^': '', '~': '', '`': '',
+            '²': '2', '³': '3', 'ª': '', 'º': '', '°': '', 'ª': ''
+        };
+        return str.replace(/[^\w\s]/gi, function (char) {
+            return mapa[char] || '';
+        }).replace(/\s+/g, '_').toUpperCase();
+    }
+
+    // Função para formatar o nome da classe
+    function formatarNomeClasse(nome) {
+        return nome.split(' ').map((palavra) => {
+            return palavra.charAt(0).toUpperCase() + palavra.slice(1);
+        }).join('');
+    }
+
+    // Função para gerar o código do enum
+    function gerarEnum() {
+        const nomeEnumInput = document.getElementById('nomeEnumInput').value.trim();
+        const entradaCsv = document.getElementById('entradaCsv').value.trim();
+        const usarLombok = document.getElementById('usarLombok').checked;
+        const usarLambda = document.getElementById('usarLambda').checked;
+
+        // Operações
+        const incluirIsValid = document.getElementById('incluirIsValid').checked;
+        const incluirGet = document.getElementById('incluirGet').checked;
+        const incluirGetInstance = document.getElementById('incluirGetInstance').checked;
+        const incluirIsEnumName = document.getElementById('incluirIsEnumName').checked;
+
+        const areaCodigoGerado = document.getElementById('codigoGerado');
+
+        if (!nomeEnumInput) {
+            alert('Por favor, insira o nome do enum.');
+            return;
         }
 
-        // Função para formatar o nome da classe
-        function formatClassName(name) {
-            return name.split(' ').map((word) => {
-                return word.charAt(0).toUpperCase() + word.slice(1);
-            }).join('');
+        if (!entradaCsv) {
+            alert('Por favor, insira o CSV.');
+            return;
         }
 
-        // Função para gerar o código do enum
-        function generateEnum() {
-            const enumNameInput = document.getElementById('enumName').value.trim();
-            const csvInput = document.getElementById('csvInput').value.trim();
-            const useLombok = document.getElementById('useLombok').checked;
-            const useLambda = document.getElementById('useLambda').checked;
+        const nomeBaseEnum = formatarNomeClasse(nomeEnumInput);
+        const nomeEnum = nomeBaseEnum + 'Enum';
 
-            // Operações
-            const includeIsValid = document.getElementById('includeIsValid').checked;
-            const includeGet = document.getElementById('includeGet').checked;
-            const includeGetInstance = document.getElementById('includeGetInstance').checked;
-            const includeIsEnumName = document.getElementById('includeIsEnumName').checked;
+        const linhas = entradaCsv.split('\n');
+        let constantesEnum = [];
+        let csvValido = true;
 
-            const outputArea = document.getElementById('enumOutput');
-
-            if (!enumNameInput) {
-                alert('Por favor, insira o nome do enum.');
+        linhas.forEach((linha, indice) => {
+            const partes = linha.split(',');
+            if (partes.length !== 2) {
+                csvValido = false;
+                alert(`Erro na linha ${indice + 1}: O formato deve ser 'ID,DESCRIÇÃO'.`);
                 return;
             }
+            const id = partes[0].trim();
+            const descricao = partes[1].trim();
+            const nomeConstanteEnum = sanitizarNomeEnum(descricao);
 
-            if (!csvInput) {
-                alert('Por favor, insira o CSV.');
-                return;
-            }
-
-            const baseEnumName = formatClassName(enumNameInput);
-            const enumName = baseEnumName + 'Enum';
-
-            const lines = csvInput.split('\n');
-            let enumConstants = [];
-            let isValidCSV = true;
-
-            lines.forEach((line, index) => {
-                const parts = line.split(',');
-                if (parts.length !== 2) {
-                    isValidCSV = false;
-                    alert(`Erro na linha ${index + 1}: O formato deve ser 'ID,DESCRIÇÃO'.`);
-                    return;
-                }
-                const id = parts[0].trim();
-                const description = parts[1].trim();
-                const enumConstantName = sanitizeEnumName(description);
-
-                enumConstants.push({
-                    name: enumConstantName,
-                    id: id,
-                    description: description
-                });
+            constantesEnum.push({
+                nome: nomeConstanteEnum,
+                id: id,
+                descricao: descricao
             });
-
-            if (!isValidCSV) {
-                return;
-            }
-
-            // Começar a construir o código do enum
-            let enumCode = '';
-
-            if (useLombok) {
-                enumCode += '@Getter\n@AllArgsConstructor\n';
-            }
-
-            enumCode += `public enum ${enumName} {\n\n`;
-
-            // Adicionar as constantes do enum
-            enumConstants.forEach((item, index) => {
-                enumCode += `    ${item.name}(${item.id}, "${item.description}")`;
-                enumCode += index < enumConstants.length - 1 ? ',\n' : ';\n\n';
-            });
-
-            enumCode += '    private final Integer codigo;\n';
-            enumCode += '    private final String descricao;\n\n';
-
-            if (!useLombok) {
-                // Adicionar construtor
-                enumCode += `    private ${enumName}(Integer codigo, String descricao) {\n`;
-                enumCode += '        this.codigo = codigo;\n';
-                enumCode += '        this.descricao = descricao;\n';
-                enumCode += '    }\n\n';
-
-                // Adicionar getters
-                enumCode += '    public Integer getCodigo() {\n';
-                enumCode += '        return codigo;\n';
-                enumCode += '    }\n\n';
-                enumCode += '    public String getDescricao() {\n';
-                enumCode += '        return descricao;\n';
-                enumCode += '    }\n\n';
-            }
-
-            const instanceClassName = baseEnumName;
-
-            // Adicionar métodos is[EnumConstantName]
-            if (includeIsEnumName) {
-                enumConstants.forEach((item) => {
-                    const methodName = 'is' + formatClassName(item.name.toLowerCase().replace(/_/g, ' '));
-                    enumCode += `    public static boolean ${methodName}(Integer codigo) {\n`;
-                    enumCode += `        return ${item.name}.getCodigo().equals(codigo);\n`;
-                    enumCode += '    }\n\n';
-                });
-            }
-
-            // Adicionar métodos isValid, get, getInstance
-            if (includeIsValid) {
-                if (useLambda) {
-                    enumCode += '    public static boolean isValid(Integer codigo) {\n';
-                    enumCode += '        return Arrays.stream(values()).anyMatch(enumerator -> enumerator.getCodigo().equals(codigo));\n';
-                    enumCode += '    }\n\n';
-                } else {
-                    enumCode += '    public static boolean isValid(Integer codigo) {\n';
-                    enumCode += `        for (${enumName} enumerator : values()) {\n`;
-                    enumCode += '            if (enumerator.getCodigo().equals(codigo)) {\n';
-                    enumCode += '                return true;\n';
-                    enumCode += '            }\n';
-                    enumCode += '        }\n';
-                    enumCode += '        return false;\n';
-                    enumCode += '    }\n\n';
-                }
-            }
-
-            if (includeGet) {
-                if (useLambda) {
-                    enumCode += `    public static ${enumName} get(Integer codigo) {\n`;
-                    enumCode += '        return Arrays.stream(values())\n';
-                    enumCode += '                .filter(enumerator -> enumerator.getCodigo().equals(codigo))\n';
-                    enumCode += '                .findFirst()\n';
-                    enumCode += '                .orElse(null);\n';
-                    enumCode += '    }\n\n';
-                } else {
-                    enumCode += `    public static ${enumName} get(Integer codigo) {\n`;
-                    enumCode += `        for (${enumName} enumerator : values()) {\n`;
-                    enumCode += '            if (enumerator.getCodigo().equals(codigo)) {\n';
-                    enumCode += '                return enumerator;\n';
-                    enumCode += '            }\n';
-                    enumCode += '        }\n';
-                    enumCode += '        return null;\n';
-                    enumCode += '    }\n\n';
-                }
-            }
-
-            if (includeGetInstance) {
-                if (useLambda) {
-                    enumCode += `    public static ${instanceClassName} getInstance(Integer codigo) {\n`;
-                    enumCode += '        return Arrays.stream(values())\n';
-                    enumCode += '                .filter(enumerator -> enumerator.getCodigo().equals(codigo))\n';
-                    enumCode += `                .findFirst()\n`;
-                    enumCode += `                .map(situacao -> new ${instanceClassName}(situacao.getCodigo(), situacao.getDescricao()))\n`;
-                    enumCode += '                .orElse(null);\n';
-                    enumCode += '    }\n\n';
-                } else {
-                    enumCode += `    public static ${instanceClassName} getInstance(Integer codigo) {\n`;
-                    enumCode += `        for (${enumName} enumerator : values()) {\n`;
-                    enumCode += '            if (enumerator.getCodigo().equals(codigo)) {\n';
-                    enumCode += `                return new ${instanceClassName}(enumerator.getCodigo(), enumerator.getDescricao());\n`;
-                    enumCode += '            }\n';
-                    enumCode += '        }\n';
-                    enumCode += '        return null;\n';
-                    enumCode += '    }\n\n';
-                }
-                // Método getInstance() não estático
-                enumCode += `    public ${instanceClassName} getInstance() {\n`;
-                enumCode += `        return new ${instanceClassName}(this.getCodigo(), this.getDescricao());\n`;
-                enumCode += '    }\n';
-            }
-
-            enumCode += '}';
-
-            outputArea.value = enumCode;
-        }
-
-        // Evento do botão "Gerar"
-        document.getElementById('generateBtn').addEventListener('click', generateEnum);
-
-        // Evento do botão "Copiar"
-        document.getElementById('copyBtn').addEventListener('click', function () {
-            const outputArea = document.getElementById('enumOutput');
-            outputArea.select();
-            outputArea.setSelectionRange(0, 99999); // Para dispositivos móveis
-
-            if (navigator.clipboard && window.isSecureContext) {
-                // Uso da API Clipboard
-                navigator.clipboard.writeText(outputArea.value).then(function () {
-                    alert('Código copiado para a área de transferência!');
-                }, function (err) {
-                    console.error('Erro ao copiar o texto: ', err);
-                });
-            } else {
-                // Método de fallback
-                document.execCommand('copy');
-                alert('Código copiado para a área de transferência!');
-            }
         });
 
-        // Inicializando os checkboxes do Semantic UI
-        $('.ui.checkbox').checkbox();
-    </script>
+        if (!csvValido) {
+            return;
+        }
+
+        // Início da construção do código do enum
+        let codigoEnum = '';
+
+        if (usarLombok) {
+            codigoEnum += '@Getter\n@AllArgsConstructor\n';
+        }
+
+        codigoEnum += `public enum ${nomeEnum} {\n\n`;
+
+        // Adicionar as constantes do enum
+        constantesEnum.forEach((item, indice) => {
+            codigoEnum += `    ${item.nome}(${item.id}, "${item.descricao}")`;
+            codigoEnum += indice < constantesEnum.length - 1 ? ',\n' : ';\n\n';
+        });
+
+        codigoEnum += '    private final Integer codigo;\n';
+        codigoEnum += '    private final String descricao;\n\n';
+
+        if (!usarLombok) {
+            // Adicionar construtor
+            codigoEnum += `    private ${nomeEnum}(Integer codigo, String descricao) {\n`;
+            codigoEnum += '        this.codigo = codigo;\n';
+            codigoEnum += '        this.descricao = descricao;\n';
+            codigoEnum += '    }\n\n';
+
+            // Adicionar getters
+            codigoEnum += '    public Integer getCodigo() {\n';
+            codigoEnum += '        return codigo;\n';
+            codigoEnum += '    }\n\n';
+            codigoEnum += '    public String getDescricao() {\n';
+            codigoEnum += '        return descricao;\n';
+            codigoEnum += '    }\n\n';
+        }
+
+        const nomeClasseInstancia = nomeBaseEnum;
+
+        // Adicionar métodos is[EnumConstantName]
+        if (incluirIsEnumName) {
+            constantesEnum.forEach((item) => {
+                const nomeMetodo = 'is' + formatarNomeClasse(item.nome.toLowerCase().replace(/_/g, ' '));
+                codigoEnum += `    public static boolean ${nomeMetodo}(Integer codigo) {\n`;
+                codigoEnum += `        return ${item.nome}.getCodigo().equals(codigo);\n`;
+                codigoEnum += '    }\n\n';
+            });
+        }
+
+        // Adicionar métodos isValid, get, getInstance
+        if (incluirIsValid) {
+            if (usarLambda) {
+                codigoEnum += '    public static boolean isValid(Integer codigo) {\n';
+                codigoEnum += '        return Arrays.stream(values()).anyMatch(enumerator -> enumerator.getCodigo().equals(codigo));\n';
+                codigoEnum += '    }\n\n';
+            } else {
+                codigoEnum += '    public static boolean isValid(Integer codigo) {\n';
+                codigoEnum += `        for (${nomeEnum} enumerator : values()) {\n`;
+                codigoEnum += '            if (enumerator.getCodigo().equals(codigo)) {\n';
+                codigoEnum += '                return true;\n';
+                codigoEnum += '            }\n';
+                codigoEnum += '        }\n';
+                codigoEnum += '        return false;\n';
+                codigoEnum += '    }\n\n';
+            }
+        }
+
+        if (incluirGet) {
+            if (usarLambda) {
+                codigoEnum += `    public static ${nomeEnum} get(Integer codigo) {\n`;
+                codigoEnum += '        return Arrays.stream(values())\n';
+                codigoEnum += '                .filter(enumerator -> enumerator.getCodigo().equals(codigo))\n';
+                codigoEnum += '                .findFirst()\n';
+                codigoEnum += '                .orElse(null);\n';
+                codigoEnum += '    }\n\n';
+            } else {
+                codigoEnum += `    public static ${nomeEnum} get(Integer codigo) {\n`;
+                codigoEnum += `        for (${nomeEnum} enumerator : values()) {\n`;
+                codigoEnum += '            if (enumerator.getCodigo().equals(codigo)) {\n';
+                codigoEnum += '                return enumerator;\n';
+                codigoEnum += '            }\n';
+                codigoEnum += '        }\n';
+                codigoEnum += '        return null;\n';
+                codigoEnum += '    }\n\n';
+            }
+        }
+
+        if (incluirGetInstance) {
+            if (usarLambda) {
+                codigoEnum += `    public static ${nomeClasseInstancia} getInstance(Integer codigo) {\n`;
+                codigoEnum += '        return Arrays.stream(values())\n';
+                codigoEnum += '                .filter(enumerator -> enumerator.getCodigo().equals(codigo))\n';
+                codigoEnum += `                .findFirst()\n`;
+                codigoEnum += `                .map(dados -> new ${nomeClasseInstancia}(dados.getCodigo(), dados.getDescricao()))\n`;
+                codigoEnum += '                .orElse(null);\n';
+                codigoEnum += '    }\n\n';
+            } else {
+                codigoEnum += `    public static ${nomeClasseInstancia} getInstance(Integer codigo) {\n`;
+                codigoEnum += `        for (${nomeEnum} enumerator : values()) {\n`;
+                codigoEnum += '            if (enumerator.getCodigo().equals(codigo)) {\n';
+                codigoEnum += `                return new ${nomeClasseInstancia}(enumerator.getCodigo(), enumerator.getDescricao());\n`;
+                codigoEnum += '            }\n';
+                codigoEnum += '        }\n';
+                codigoEnum += '        return null;\n';
+                codigoEnum += '    }\n\n';
+            }
+            // Metodo getInstance() não estático
+            codigoEnum += `    public ${nomeClasseInstancia} getInstance() {\n`;
+            codigoEnum += `        return new ${nomeClasseInstancia}(this.getCodigo(), this.getDescricao());\n`;
+            codigoEnum += '    }\n';
+        }
+
+        codigoEnum += '}';
+
+        areaCodigoGerado.value = codigoEnum;
+    }
+
+    // Evento do botão "Gerar"
+    document.getElementById('botaoGerar').addEventListener('click', gerarEnum);
+
+    // Inicializando os checkboxes do Semantic UI
+    $('.ui.checkbox').checkbox();
+
+    // Função para copiar o conteúdo de uma área de texto
+    function copiarTexto(elementoId) {
+        const elemento = document.getElementById(elementoId);
+        elemento.select();
+        elemento.setSelectionRange(0, 99999); // Para dispositivos móveis
+
+        if (navigator.clipboard && window.isSecureContext) {
+            // Uso da API Clipboard
+            navigator.clipboard.writeText(elemento.value).then(function () {
+                alert('Texto copiado para a área de transferência!');
+            }, function (err) {
+                console.error('Erro ao copiar o texto: ', err);
+            });
+        } else {
+            alert('Texto copiado para a área de transferência!');
+        }
+    }
+
+    // Função para limpar o conteúdo de uma área de texto
+    function limparTexto(elementoId) {
+        document.getElementById(elementoId).value = '';
+    }
+
+    // Função para baixar o conteúdo de uma área de texto como arquivo
+    function baixarTexto(elementoId, nomeArquivo) {
+        const conteudo = document.getElementById(elementoId).value;
+        if (!conteudo) {
+            alert('Nada para baixar!');
+            return;
+        }
+        const blob = new Blob([conteudo], {type: 'text/plain;charset=utf-8'});
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = nomeArquivo;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+
+    // Eventos para os botões da "Entrada CSV"
+    document.getElementById('copiarEntradaCsv').addEventListener('click', function () {
+        copiarTexto('entradaCsv');
+    });
+
+    document.getElementById('limparEntradaCsv').addEventListener('click', function () {
+        limparTexto('entradaCsv');
+    });
+
+    document.getElementById('baixarEntradaCsv').addEventListener('click', function () {
+        const dataHoraAtual = new Date().toISOString().replace(/[:.]/g, '-');
+        const nomeArquivo = `entrada_csv_${dataHoraAtual}.csv`;
+        baixarTexto('entradaCsv', nomeArquivo);
+    });
+
+    // Eventos para os botões do "Código Gerado"
+    document.getElementById('copiarCodigoGerado').addEventListener('click', function () {
+        copiarTexto('codigoGerado');
+    });
+
+    document.getElementById('limparCodigoGerado').addEventListener('click', function () {
+        limparTexto('codigoGerado');
+    });
+
+    document.getElementById('baixarCodigoGerado').addEventListener('click', function () {
+        const nomeEnumInput = document.getElementById('nomeEnumInput').value.trim();
+        if (!nomeEnumInput) {
+            alert('Por favor, insira o nome do enum antes de baixar o código.');
+            return;
+        }
+        const nomeBaseEnum = formatarNomeClasse(nomeEnumInput);
+        const nomeEnum = nomeBaseEnum + 'Enum';
+        const nomeArquivo = `${nomeEnum}.java`;
+        baixarTexto('codigoGerado', nomeArquivo);
+    });
+</script>
 
 </body>
-
 </html>
